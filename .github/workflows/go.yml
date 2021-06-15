@@ -18,6 +18,12 @@ jobs:
       with:
         go-version: 1.15
 
+    - name: Get missing Modules 1
+      run:  go get github.com/anmitsu/go-shlex 
+    
+    - name: Get missing Modules 2
+      run:  go get golang.org/x/crypto
+    
     - name: Build
       run: go build -v ./...
 

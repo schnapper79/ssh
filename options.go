@@ -42,6 +42,42 @@ func HostKeyFile(filepath string) Option {
 	}
 }
 
+// HostKeyFile returns a functional option that adds HostSigners to the server
+// from a PEM file at filepath.
+func HostKeyFileWithCert(filepathKey,filepathCert string) Option {
+	return func(srv *Server) error {
+		pemBytes, err := ioutil.ReadFile(filepathKey)
+		if err != nil {
+			return err
+		}
+		
+		certBytes, err:=ioutil.ReadFile(filepathCert)
+		if err != nil {
+			return err
+		}
+
+		signer, err := gossh.ParsePrivateKey(pemBytes)
+		if err != nil {
+			return err
+		}
+
+		certPubKey, _, _, _, err := ssh.ParseAuthorizedKey(certBytes)
+		if err != nil {
+			return err
+		}
+		validCert, ok := certPubKey.(*gossh.Certificate)
+		if !ok {
+			return err
+		}
+		
+		certSigner,err:=NewCertSigner(validCert, signer)
+		
+		srv.AddHostKey(certSigner)
+
+		return nil
+	}
+}
+
 func KeyboardInteractiveAuth(fn KeyboardInteractiveHandler) Option {
 	return func(srv *Server) error {
 		srv.KeyboardInteractiveHandler = fn

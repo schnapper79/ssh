@@ -61,7 +61,7 @@ func HostKeyFileWithCert(filepathKey,filepathCert string) Option {
 			return err
 		}
 
-		certPubKey, _, _, _, err := ssh.ParseAuthorizedKey(certBytes)
+		certPubKey, _, _, _, err := gossh.ParseAuthorizedKey(certBytes)
 		if err != nil {
 			return err
 		}

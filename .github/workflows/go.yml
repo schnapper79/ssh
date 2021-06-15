@@ -22,7 +22,7 @@ jobs:
       run:  go get github.com/anmitsu/go-shlex 
     
     - name: Get missing Modules 2
-      run:  go get golang.org/x/crypto
+      run:  go get -u golang.org/x/crypto/...
     
     - name: Build
       run: go build -v ./...

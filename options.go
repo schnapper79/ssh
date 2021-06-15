@@ -70,7 +70,7 @@ func HostKeyFileWithCert(filepathKey,filepathCert string) Option {
 			return err
 		}
 		
-		certSigner,err:=NewCertSigner(validCert, signer)
+		certSigner,err:=gossh.NewCertSigner(validCert, signer)
 		
 		srv.AddHostKey(certSigner)
 

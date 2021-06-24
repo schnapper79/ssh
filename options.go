@@ -44,14 +44,14 @@ func HostKeyFile(filepath string) Option {
 
 // HostKeyFile returns a functional option that adds HostSigners to the server
 // from a PEM file at filepath.
-func HostKeyFileWithCert(filepathKey,filepathCert string) Option {
+func HostKeyFileWithCert(filepathKey, filepathCert string) Option {
 	return func(srv *Server) error {
 		pemBytes, err := ioutil.ReadFile(filepathKey)
 		if err != nil {
 			return err
 		}
-		
-		certBytes, err:=ioutil.ReadFile(filepathCert)
+
+		certBytes, err := ioutil.ReadFile(filepathCert)
 		if err != nil {
 			return err
 		}
@@ -69,9 +69,35 @@ func HostKeyFileWithCert(filepathKey,filepathCert string) Option {
 		if !ok {
 			return err
 		}
-		
-		certSigner,err:=gossh.NewCertSigner(validCert, signer)
-		
+
+		certSigner, err := gossh.NewCertSigner(validCert, signer)
+
+		srv.AddHostKey(certSigner)
+
+		return nil
+	}
+}
+
+// HostKeyFile returns a functional option that adds HostSigners to the server
+// from a PEM file at filepath.
+func HostKeyWithCertFromRaw(rawKey, rawCert []byte) Option {
+	return func(srv *Server) error {
+		signer, err := gossh.ParsePrivateKey(rawKey)
+		if err != nil {
+			return err
+		}
+
+		certPubKey, _, _, _, err := gossh.ParseAuthorizedKey(rawCert)
+		if err != nil {
+			return err
+		}
+		validCert, ok := certPubKey.(*gossh.Certificate)
+		if !ok {
+			return err
+		}
+
+		certSigner, err := gossh.NewCertSigner(validCert, signer)
+
 		srv.AddHostKey(certSigner)
 
 		return nil

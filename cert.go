@@ -25,6 +25,15 @@ func (ca *ClientCertAuth) ReadFile(filepath string) error {
 	return nil
 }
 
+func (ca *ClientCertAuth) ReadBytes(pub []byte) error {
+	hc, _, _, _, err := ParseAuthorizedKey(pub)
+	if err != nil {
+		return err
+	}
+	ca.UserCaKeyPub = hc
+	return nil
+}
+
 func (ca *ClientCertAuth) CheckClientCert(ctx Context, key PublicKey) bool {
 	validCert, ok := key.(*gossh.Certificate)
 	if !ok {
